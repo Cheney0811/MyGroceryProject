@@ -14,9 +14,10 @@ class Premium_User(models.Model):
     Premium_User_Name = models.CharField(null = False, max_length = 10)
     Premium_User_Password = models.CharField(null = False, max_length = 20)
     Email = models.EmailField(null = False)
-    Address = models.TextField(null = False)
-    Zip = models.CharField(null = False, max_length = 11)
-    Phone = models.CharField(null = False, max_length = 10)
+    Store_Name = models.CharField(null = False, max_length = 10)
+    Store_Address = models.TextField(null = False)
+    Store_Zip = models.CharField(null = False, max_length = 11)
+    Store_Phone = models.CharField(null = False, max_length = 10)
 
 class General_User(models.Model):
     General_User_ID = models.IntegerField(primary_key = True)

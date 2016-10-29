@@ -8,6 +8,8 @@
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/bootstrap.min.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" />
     <script src="{% static 'app/scripts/modernizr-2.6.2.js' %}"></script>
+    <script src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script>
+    <script src="{% static 'app/scripts/jquery.formset.js' %}"></script> <!--Refer to https://github.com/elo80ka/django-dynamic-formset -->
 </head>
 
 <body>
@@ -24,11 +26,12 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li><a href="{% url 'home' %}">Home</a></li>
-                    <li><a href="app/login.html">Log in</a></li>
+                    <li><a href="{% url 'LogIn' %}">Log in</a></li>
                 </ul>
                 
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="app/searchForProduct.html">Search</a></li>
+                    <li><a href="{% url 'searchStores' %}">Search Stores</a></li>
+                    <li><a href="{% url 'searchProduct' %}">Search Product</a></li>
                 </ul>
 
             </div>

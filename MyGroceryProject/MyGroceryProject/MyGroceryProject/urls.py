@@ -25,10 +25,6 @@ urlpatterns = [
     url(r'^app/PremiumUserPublishAD',  app.views.PremiumUserPublishAD, name = 'PremiumUserPublishAD'),
     url(r'^app/searchForStores', app.views.searchStores, name = 'searchStores'),
     url(r'^app/searchForProduct', app.views.searchProduct, name = 'searchProduct'),
-
-    #Dynamic_forms Ref to https://github.com/MarkusH/django-dynamic-forms
-    url(r'^dynamic_forms/',
-        include('dynamic_forms.urls', namespace='dynamic_forms'))
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

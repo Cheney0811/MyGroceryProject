@@ -52,6 +52,7 @@
     <Folder Include="MyGroceryProject\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app\static\app\scripts\jquery.formset.js" />
     <Content Include="app\templates\app\GeneralUserRegister.html" />
     <Content Include="app\templates\app\PremiumUserDashboard.html" />
     <Content Include="app\templates\app\PremiumUserPublishAD.html" />

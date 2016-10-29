@@ -3,6 +3,7 @@ Definition of forms.
 """
 
 from django import forms
+from django.forms.formsets import BaseFormSet
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import ugettext_lazy as _
 
@@ -47,6 +48,48 @@ class publishAdvertisementForm(forms.Form):
     AD_Subject = forms.CharField(label = 'Product Name', max_length = 10)
     AD_Content = forms.FileField()
 
-class updateInventoryForm(forms.Form):
-    AD_Subject = forms.CharField(label = 'Product Name', max_length = 10)
-    AD_Content = forms.FileField()
+
+class InventoryForm(forms.Form):
+    Item_Name = forms.CharField(label = 'Product Name', max_length = 10)
+    Item_Price = forms.DecimalField(label = 'Product Price', decimal_places = 2, max_digits = 5)
+    Item_Quantity = forms.IntegerField(label = 'Product Quantity')
+
+class InventoryFormSet(InventoryForm):
+    def __init__(self, *args, **kwargs):
+        super(InventoryFormSet, self).__init__(*args, **kwargs)
+        Item_Name_List = []
+        Item_Price_List = []
+        Item_Quantity_list = []
+
+        duplicates = False
+
+        for form in self:
+                if form.cleaned_data:
+                    name = form.cleaned_data['Item_Name']
+                    price = form.cleaned_data['Item_Price']
+                    quantity = form.cleaned_data['Item_Quantity']
+                    # Check that no two items are duplicates
+                    if name and price and quantity:
+                        if name in Item_Name_List:
+                            duplicates = True
+                        Item_Name_List.append(name)
+
+                        if price in Item_Price_List:
+                            duplicates = True
+                        Item_Price_List.append(price)
+
+                        if quantity in Item_Quantity_list:
+                            duplicates = True
+                        Item_Quantity_list.append(quantity)
+
+                    if duplicates:
+                        raise forms.ValidationError(
+                            'Items must have unique names',
+                            code='duplicate_Names'
+                        )
+
+    def clean(self):
+        if any(self.errors):
+            return
+    
+         

@@ -10,14 +10,9 @@ from datetime import datetime
 
 #My import
 from django.http import HttpResponseRedirect
+from django.forms.formsets import formset_factory
 #Import all the forms
-from app.forms import generalUserRegForm
-from app.forms import premiumUserRegForm
-from app.forms import userLoginForm
-from app.forms import searchForStoreForm
-from app.forms import searchForProductForm
-from app.forms import publishAdvertisementForm
-from app.forms import updateInventoryForm
+from app.forms import generalUserRegForm,premiumUserRegForm,userLoginForm,searchForStoreForm,searchForProductForm,publishAdvertisementForm,InventoryForm,InventoryFormSet
 
 
 def home(request):
@@ -193,29 +188,31 @@ def PremiumDashboardLogedIn(request):
     )
 
 def PremiumUserUpdateInventory(request):
-    assert isinstance(request, HttpRequest)
+
     if request.method == 'POST':  
-                f = updateInventoryForm(request.POST)
-                if f.is_valid():     
-                    Subject = f.cleaned_data.get('AD_Subject')
-                    File = f.cleaned_data.get('AD_Content') 
+                fset = InventoryFormSet(request.POST)
+                if fset.is_valid():     
+                    for f in fset:
+                        Name = f.cleaned_data.get('Item_Name')
+                        Price = f.cleaned_data.get('Item_Price')
+                        Quantity = f.cleaned_data.get('Item_Quantity')
                     return HttpResponseRedirect('PremiumUserUpdateInventory.html')#TODO: Search page or update information page
                 else:
                     return render(
                                 request,
                                 'app/PremiumUserUpdateInventory.html',
                                 {
-                                    'updateInventoryForm':f,
+                                    'InventoryFormSet':f,
                                     'year':datetime.now().year
                                 }
                             )          
     else:
-        f = updateInventoryForm()
+        f = InventoryFormSet()
         return render(
                     request,
                     'app/PremiumUserUpdateInventory.html',
                     {
-                        'updateInventoryForm':f,
+                        'InventoryFormSet':f,
                         'year':datetime.now().year
                     }
                 )

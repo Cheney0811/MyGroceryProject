@@ -2,6 +2,14 @@
 
 {% block content %}
 
+
+<script>
+    $('.myFormset').formset({
+        addText: 'add link',
+        deleteText: 'remove'
+    });
+</script>
+
 <div class="jumbotron">
     <h2>Update Inventory</h2>
 </div>
@@ -10,20 +18,39 @@
     <div class="row">
         <div class="col-md-3"></div>
             <div class="col-md-6">
-                {% if updateInventoryForm.errors %}
+                {% if InventoryFormSet.errors %}
                 <p style="color: red;">
-                    Correct the following errors {{ updateInventoryForm.errors|pluralize }}.
+                    Correct the following errors {{ InventoryFormSet.errors|pluralize }}.
                 </p>
                 {% endif %}
-                <FORM method="post">
-                    {% csrf_token %}
-                    <table class="table table-striped">
-                    {{ updateInventoryForm.as_table }}
-                    </table>
-                    <p> <input name="reserve" TYPE="submit" VALUE="Publish" 
-                    class="btn btn-default btn-lg pull-right" /></p>
-                    <p><a class="btn btn-warning btn-lg" href="PremiumUserDashboard.html">Cancel</a></p>
-                </FORM>
+                    
+
+                {{InventoryFormSet.management_form}}
+           
+                 {% for myform in InventoryFormSet %}
+                <div class="myFormset">
+                    {{ myform.Item_Name }}
+                    {% if myform.Item_Name.errors %}
+                        {% for error in myform.Item_Name.errors %}
+                            {{ error|escape }}
+                        {% endfor %}
+                    {% endif %}
+
+                    {{ myform.Item_Price }}
+                    {% if myform.Item_Price.errors %}
+                        {% for error in myform.Item_Price.errors %}
+                            {{ error|escape }}
+                        {% endfor %}
+                    {% endif %}
+
+                    {{ myform.Item_Quantity }}
+                    {% if myform.Item_Quantity.errors %}
+                        {% for error in myform.Item_Quantity.errors %}
+                            {{ error|escape }}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                {% endfor %}
             </div>
         <div class="col-md-3"></div>
     </div>

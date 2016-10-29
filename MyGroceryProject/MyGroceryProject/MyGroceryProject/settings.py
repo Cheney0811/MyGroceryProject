@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #Dynamic_forms Ref to https://github.com/MarkusH/django-dynamic-forms
+    'dynamic_forms.apps.DynamicFormsConfig',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -51,6 +53,8 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+     #Dynamic_forms Ref to https://github.com/MarkusH/django-dynamic-forms
+    'dynamic_forms.middlewares.FormModelMiddleware'
 ]
 
 ROOT_URLCONF = 'MyGroceryProject.urls'

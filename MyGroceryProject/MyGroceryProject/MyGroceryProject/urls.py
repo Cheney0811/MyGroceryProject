@@ -19,9 +19,16 @@ urlpatterns = [
     url(r'^$', app.views.home, name='home'),
     url(r'^GeneralUserRegister', app.views.generalUserReg, name = 'GeneralUserReg'),
     url(r'^PremiumUserRegister', app.views.premiumUserReg, name = 'PremiumUserReg'),
-    url(r'^app/login',  app.views.userLogin, name = 'LogIn'),       
+    url(r'^app/login',  app.views.userLogin, name = 'LogIn'),  
+    url(r'^app/PremiumUserDashboard',  app.views.PremiumDashboardLogedIn, name = 'PremumUserDashboard'),     
+    url(r'^app/PremiumUserUpdateInventory',  app.views.PremiumUserUpdateInventory, name = 'PremiumUserUpdateInventory'),
+    url(r'^app/PremiumUserPublishAD',  app.views.PremiumUserPublishAD, name = 'PremiumUserPublishAD'),
     url(r'^app/searchForStores', app.views.searchStores, name = 'searchStores'),
-    url(r'^app/searchForProduct', app.views.searchProduct, name = 'searchProduct')
+    url(r'^app/searchForProduct', app.views.searchProduct, name = 'searchProduct'),
+
+    #Dynamic_forms Ref to https://github.com/MarkusH/django-dynamic-forms
+    url(r'^dynamic_forms/',
+        include('dynamic_forms.urls', namespace='dynamic_forms'))
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

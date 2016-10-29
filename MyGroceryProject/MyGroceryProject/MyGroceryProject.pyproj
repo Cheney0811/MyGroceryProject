@@ -53,7 +53,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="app\templates\app\GeneralUserRegister.html" />
+    <Content Include="app\templates\app\PremiumUserDashboard.html" />
+    <Content Include="app\templates\app\PremiumUserPublishAD.html" />
     <Content Include="app\templates\app\PremiumUserRegister.html" />
+    <Content Include="app\templates\app\PremiumUserUpdateInventory.html" />
     <Content Include="app\templates\app\searchForProduct.html" />
     <Content Include="app\templates\app\searchForStores.html" />
     <Content Include="requirements.txt" />

@@ -10,11 +10,15 @@ from datetime import datetime
 
 #My import
 from django.http import HttpResponseRedirect
+#Import all the forms
 from app.forms import generalUserRegForm
 from app.forms import premiumUserRegForm
 from app.forms import userLoginForm
 from app.forms import searchForStoreForm
 from app.forms import searchForProductForm
+from app.forms import publishAdvertisementForm
+from app.forms import updateInventoryForm
+
 
 def home(request):
     """Renders the home page."""
@@ -98,7 +102,11 @@ def userLogin(request):
                 if f.is_valid():     
                     userName = f.cleaned_data.get('User_Name')
                     password = f.cleaned_data.get('User_Password')   
-                    return HttpResponseRedirect('searchForStores.html')#TODO: Search page or update information page
+                    #TODO: Add checking condition if it is Premium user or General user login.
+                    #If Premium User Login go to PremiumUserDashboard.html
+                    return HttpResponseRedirect('PremiumUserDashboard.html')#TODO: Search page or update information page
+                    #If General User Login go to GeneralUserDashboard.html
+                    #return HttpResponseRedirect('PremiumUserDashboard.html')#TODO: Search page or update information page
                 else:
                     return render(
                                 request,
@@ -169,6 +177,73 @@ def searchProduct(request):
                     'app/searchForProduct.html',
                     {
                         'searchForProductForm':f,
+                        'year':datetime.now().year
+                    }
+                )
+
+def PremiumDashboardLogedIn(request):
+    assert isinstance(request, HttpRequest)
+    return render(
+        request,
+        'app/PremiumUserDashboard.html',
+        {
+            'title':'Premium User Dashboard',
+            'year':datetime.now().year,
+        }
+    )
+
+def PremiumUserUpdateInventory(request):
+    assert isinstance(request, HttpRequest)
+    if request.method == 'POST':  
+                f = updateInventoryForm(request.POST)
+                if f.is_valid():     
+                    Subject = f.cleaned_data.get('AD_Subject')
+                    File = f.cleaned_data.get('AD_Content') 
+                    return HttpResponseRedirect('PremiumUserUpdateInventory.html')#TODO: Search page or update information page
+                else:
+                    return render(
+                                request,
+                                'app/PremiumUserUpdateInventory.html',
+                                {
+                                    'updateInventoryForm':f,
+                                    'year':datetime.now().year
+                                }
+                            )          
+    else:
+        f = updateInventoryForm()
+        return render(
+                    request,
+                    'app/PremiumUserUpdateInventory.html',
+                    {
+                        'updateInventoryForm':f,
+                        'year':datetime.now().year
+                    }
+                )
+
+def PremiumUserPublishAD(request):
+    assert isinstance(request, HttpRequest)
+    if request.method == 'POST':  
+                f = publishAdvertisementForm(request.POST)
+                if f.is_valid():     
+                    Subject = f.cleaned_data.get('AD_Subject')
+                    File = f.cleaned_data.get('AD_Content') 
+                    return HttpResponseRedirect('PremiumUserPublishAD.html')#TODO: Search page or update information page
+                else:
+                    return render(
+                                request,
+                                'app/PremiumUserPublishAD.html',
+                                {
+                                    'publishAdvertisementForm':f,
+                                    'year':datetime.now().year
+                                }
+                            )          
+    else:
+        f = publishAdvertisementForm()
+        return render(
+                    request,
+                    'app/PremiumUserPublishAD.html',
+                    {
+                        'publishAdvertisementForm':f,
                         'year':datetime.now().year
                     }
                 )

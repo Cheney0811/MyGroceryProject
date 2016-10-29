@@ -1,0 +1,26 @@
+﻿{% extends "app/layout.html" %}
+
+{% block content %}
+
+<div class="jumbotron">
+    <h1>MyGrocery</h1>
+    <h2>Premium User Dashboard</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <h2>Update Inventory</h2>
+        <h4>
+            Update inventory information regularly here to let the customers know their favorite food is here!
+            <br><br>
+        </h4>
+        <p><a class="btn btn-default btn-lg" href="PremiumUserUpdateInventory.html">Update Inventory &raquo;</a></p>
+    </div>
+    <div class="col-md-6">
+        <h2>Publish Advertisement</h2>
+        <h4>If you would like more customer to know about your product, you can publish an advertisement here! Just put a subject and upload your poster!</h4>
+        <p><a class="btn btn-default btn-lg" href="PremiumUserPublishAD.html">Publish Advertisement &raquo;</a></p>
+    </div>
+</div>
+
+{% endblock %}

@@ -42,3 +42,11 @@ class searchForStoreForm(forms.Form):
 
 class searchForProductForm(forms.Form):
     Product_Name = forms.CharField(label = 'Product Name', max_length = 10)
+
+class publishAdvertisementForm(forms.Form):
+    AD_Subject = forms.CharField(label = 'Product Name', max_length = 10)
+    AD_Content = forms.FileField()
+
+class updateInventoryForm(forms.Form):
+    AD_Subject = forms.CharField(label = 'Product Name', max_length = 10)
+    AD_Content = forms.FileField()

@@ -10,6 +10,9 @@
     <div class="row">
         <div class="col-md-3"></div>
             <div class="col-md-6">
+                <p style="color: red;">
+                    User name and password doesn't match.
+                </p>
                 {% if userLoginForm.errors %}
                 <p style="color: red;">
                     Correct the following errors {{ userLoginForm.errors|pluralize }}.

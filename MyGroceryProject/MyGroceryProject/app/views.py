@@ -12,7 +12,7 @@ from datetime import datetime
 from django.http import HttpResponseRedirect
 from django.forms.formsets import formset_factory
 #Import all the forms
-from app.forms import generalUserRegForm,premiumUserRegForm,userLoginForm,searchForStoreForm,searchForProductForm,publishAdvertisementForm,InventoryForm,InventoryFormSet
+from app.forms import generalUserRegForm,premiumUserRegForm,userLoginForm,searchForStoreForm,searchForProductForm,publishAdvertisementForm,InventoryForm
 
 
 def home(request):
@@ -188,34 +188,37 @@ def PremiumDashboardLogedIn(request):
     )
 
 def PremiumUserUpdateInventory(request):
+    assert isinstance(request, HttpRequest)
+    
+    InventoryFormSet = formset_factory(InventoryForm)
 
-    if request.method == 'POST':  
-                fset = InventoryFormSet(request.POST)
-                if fset.is_valid():     
-                    for f in fset:
-                        Name = f.cleaned_data.get('Item_Name')
-                        Price = f.cleaned_data.get('Item_Price')
-                        Quantity = f.cleaned_data.get('Item_Quantity')
-                    return HttpResponseRedirect('PremiumUserUpdateInventory.html')#TODO: Search page or update information page
-                else:
-                    return render(
-                                request,
-                                'app/PremiumUserUpdateInventory.html',
-                                {
-                                    'InventoryFormSet':f,
-                                    'year':datetime.now().year
-                                }
-                            )          
+    if request.method == 'POST':
+        form = InventoryForm(request.POST)
+        childrenFormset = InventoryFormSet(request.POST, prefix="test")
+
+        # check whether it's valid:
+        if form.is_valid() and childrenFormset.is_valid():
+            form.save()
+            childrenFormset.save()
+
+            # redirect to the edit url (eventually will be to the view URL)
+            return HttpResponseRedirect('PremiumUserUpdateInventory.html')
+        else:
+            print (form.errors)
+            print (childrenFormset.errors)
+
+    # if a GET 
     else:
-        f = InventoryFormSet()
-        return render(
-                    request,
-                    'app/PremiumUserUpdateInventory.html',
-                    {
-                        'InventoryFormSet':f,
-                        'year':datetime.now().year
-                    }
-                )
+        form = InventoryForm()
+        childrenFormset = InventoryFormSet(prefix="test")
+        
+
+    return render(request, 'app/PremiumUserUpdateInventory.html', 
+        { 
+            'InventoryFormSet' : childrenFormset, 
+            'year' : datetime.now().year, 
+            'title': "Add/Edit Inventory Items"
+            })
 
 def PremiumUserPublishAD(request):
     assert isinstance(request, HttpRequest)

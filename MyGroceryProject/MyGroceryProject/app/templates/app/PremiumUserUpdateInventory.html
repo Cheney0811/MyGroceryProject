@@ -1,14 +1,18 @@
 ﻿{% extends "app/layout.html" %}
-
+{% load static %}
 {% block content %}
 
-
-<script>
-    $('.myFormset').formset({
-        addText: 'add link',
-        deleteText: 'remove'
+<script src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script> 
+<script src="{% static 'app/scripts/jquery.formset.js' %}"></script> <!--Refer to https://github.com/elo80ka/django-dynamic-formset -->
+<script type="text/javascript">
+    $('#tableForFormset' tbody tr).formset({
+        addText: 'Add',
+        deleteText: 'Remove',
+        prefix: '{{ InventoryFormSet.prefix }}'
     });
 </script>
+
+
 
 <div class="jumbotron">
     <h2>Update Inventory</h2>
@@ -17,40 +21,42 @@
 <body>
     <div class="row">
         <div class="col-md-3"></div>
-            <div class="col-md-6">
-                {% if InventoryFormSet.errors %}
-                <p style="color: red;">
-                    Correct the following errors {{ InventoryFormSet.errors|pluralize }}.
-                </p>
-                {% endif %}
+            <div class="col-md-6">             
+
+                <form enctype=multipart/form-data action="PremiumUserUpdateInventory.html" method="post">
+                {% csrf_token %} 
                     
-
-                {{InventoryFormSet.management_form}}
-           
-                 {% for myform in InventoryFormSet %}
-                <div class="myFormset">
-                    {{ myform.Item_Name }}
-                    {% if myform.Item_Name.errors %}
-                        {% for error in myform.Item_Name.errors %}
-                            {{ error|escape }}
+                 {% if searchForProductForm.errors %}
+                <p style="color: red;">
+                    Correct the following errors {{ searchForProductForm.errors|pluralize }}.
+                </p>
+                {% endif %}       
+                <table id ="tableForFormset" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th width=40%>Item Name</th>
+                            <th width=30%>Price</th>
+                            <th width=30%>Quantity</th>
+                        </tr>
+                    </thead>                    
+                    <tbody>
+                        {% for item_form in InventoryFormSet %}                                
+                                <tr id="{{ item_form.prefix }}-row">
+                                
+                                {% for field in item_form %}
+                                    <td>                                                            
+                                        {{ field }}
+                                        {{ field.errors.as_ul }}
+                                    </td>
+                            {% endfor %}
+                             </tr>
                         {% endfor %}
-                    {% endif %}
-
-                    {{ myform.Item_Price }}
-                    {% if myform.Item_Price.errors %}
-                        {% for error in myform.Item_Price.errors %}
-                            {{ error|escape }}
-                        {% endfor %}
-                    {% endif %}
-
-                    {{ myform.Item_Quantity }}
-                    {% if myform.Item_Quantity.errors %}
-                        {% for error in myform.Item_Quantity.errors %}
-                            {{ error|escape }}
-                        {% endfor %}
-                    {% endif %}
-                </div>
-                {% endfor %}
+                    </tbody>
+                </table>
+                <br />
+                <input type="submit" value="Submit" class="btn btn-default btn-lg pull-right"/>
+                {{ InventoryFormSet.management_form}}
+                </form>
             </div>
         <div class="col-md-3"></div>
     </div>

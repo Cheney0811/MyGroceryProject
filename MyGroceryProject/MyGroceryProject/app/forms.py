@@ -3,6 +3,7 @@ Definition of forms.
 """
 
 from django import forms
+from django.forms.formsets import BaseFormSet
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import ugettext_lazy as _
 
@@ -52,6 +53,9 @@ class InventoryForm(forms.Form):
     Item_Name = forms.CharField(label = 'Product Name', max_length = 10)
     Item_Price = forms.DecimalField(label = 'Product Price', decimal_places = 2, max_digits = 5)
     Item_Quantity = forms.IntegerField(label = 'Product Quantity')
+
+
+
 
     
          

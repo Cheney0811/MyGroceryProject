@@ -190,27 +190,23 @@ def PremiumDashboardLogedIn(request):
 def PremiumUserUpdateInventory(request):
     assert isinstance(request, HttpRequest)
     
-    InventoryFormSet = formset_factory(InventoryForm)
+    Inventory_FormSet = formset_factory(InventoryForm)
 
     if request.method == 'POST':
-        form = InventoryForm(request.POST)
-        childrenFormset = InventoryFormSet(request.POST, prefix="test")
+        childrenFormset = Inventory_FormSet(request.POST)
 
         # check whether it's valid:
-        if form.is_valid() and childrenFormset.is_valid():
-            form.save()
+        if childrenFormset.is_valid():
             childrenFormset.save()
 
             # redirect to the edit url (eventually will be to the view URL)
             return HttpResponseRedirect('PremiumUserUpdateInventory.html')
         else:
-            print (form.errors)
-            print (childrenFormset.errors)
+             print (childrenFormset.errors)
 
     # if a GET 
     else:
-        form = InventoryForm()
-        childrenFormset = InventoryFormSet(prefix="test")
+        childrenFormset = Inventory_FormSet()
         
 
     return render(request, 'app/PremiumUserUpdateInventory.html', 

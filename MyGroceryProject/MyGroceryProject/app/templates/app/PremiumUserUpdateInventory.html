@@ -2,64 +2,63 @@
 {% load static %}
 {% block content %}
 
-<script src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script> 
-<script src="{% static 'app/scripts/jquery.formset.js' %}"></script> <!--Refer to https://github.com/elo80ka/django-dynamic-formset -->
-<script type="text/javascript">
-    $('#tableForFormset' tbody tr).formset({
-        addText: 'Add',
-        deleteText: 'Remove',
-        prefix: '{{ InventoryFormSet.prefix }}'
-    });
-</script>
-
 
 
 <div class="jumbotron">
     <h2>Update Inventory</h2>
 </div>
 
+<div class="row">
+ <div class="col-md-3"></div>
+ <div class="col-md-2">
+     <h4>Item Name</h4>
+ </div>
+ <div class="col-md-2">
+     <h4>Price</h4>
+ </div>
+ <div class="col-md-2">
+     <h4>Quantity</h4>
+ </div>
+<div class="col-md-3"></div>
+ </div>
+
+ 
 <body>
     <div class="row">
+                 
         <div class="col-md-3"></div>
-            <div class="col-md-6">             
-
-                <form enctype=multipart/form-data action="PremiumUserUpdateInventory.html" method="post">
+        <div class="col-md-6">
+                <form method="post">
                 {% csrf_token %} 
                     
                  {% if searchForProductForm.errors %}
                 <p style="color: red;">
                     Correct the following errors {{ searchForProductForm.errors|pluralize }}.
                 </p>
-                {% endif %}       
-                <table id ="tableForFormset" class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th width=40%>Item Name</th>
-                            <th width=30%>Price</th>
-                            <th width=30%>Quantity</th>
-                        </tr>
-                    </thead>                    
-                    <tbody>
-                        {% for item_form in InventoryFormSet %}                                
-                                <tr id="{{ item_form.prefix }}-row">
-                                
-                                {% for field in item_form %}
-                                    <td>                                                            
-                                        {{ field }}
-                                        {{ field.errors.as_ul }}
-                                    </td>
-                            {% endfor %}
-                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                {% endif %}                
+
+                {% for item_form in InventoryFormSet %}
+                    <div class="tableForFormset">                          
+                        {{item_form.Item_Name}}
+                        {{item_form.Item_Price}}
+                        {{item_form.Item_Quantity}}
+                    </div>
+                    {% endfor%}
                 <br />
                 <input type="submit" value="Submit" class="btn btn-default btn-lg pull-right"/>
                 {{ InventoryFormSet.management_form}}
                 </form>
-            </div>
+        </div>
         <div class="col-md-3"></div>
-    </div>
+            </div>        
 </body>
+<script src="{% static 'app/scripts/jquery-1.10.2.js' %}"></script> 
+<script src="{% static 'app/scripts/jquery.formset.js' %}"></script> <!--Refer to https://github.com/elo80ka/django-dynamic-formset -->
 
+<script>
+    $('.tableForFormset').formset({
+        addText: 'Add',
+        deleteText: 'remove'
+    });
+</script>
 {% endblock %}

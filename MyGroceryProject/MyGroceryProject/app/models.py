@@ -12,7 +12,7 @@ class Product(models.Model):
 class Premium_User(models.Model):
     Premium_User_ID = models.IntegerField(primary_key = True)
     Premium_User_Name = models.CharField(null = False, max_length = 10)
-    Premium_User_Password = models.CharField(null = False, max_length = 20)
+    Premium_User_Password = models.BinaryField(null = False)
     Email = models.EmailField(null = False)
     Store_Name = models.CharField(null = False, max_length = 10)
     Store_Address = models.TextField(null = False)
@@ -22,7 +22,7 @@ class Premium_User(models.Model):
 class General_User(models.Model):
     General_User_ID = models.IntegerField(primary_key = True)
     General_User_Name = models.CharField(null = False, max_length = 10)
-    General_User_Password = models.CharField(null = False, max_length = 20)
+    General_User_Password = models.BinaryField(null = False)
     Email = models.EmailField(null = False)
 
 class Product_List(models.Model):

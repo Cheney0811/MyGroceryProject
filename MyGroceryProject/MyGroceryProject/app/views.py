@@ -10,10 +10,20 @@ from datetime import datetime
 
 #My import
 from django.http import HttpResponseRedirect
+from django.http import HttpResponse
 from django.forms.formsets import formset_factory
+import sys
+#Hash lib import
+import hashlib
+#Import models py
+from app.models import *
 #Import all the forms
 from app.forms import generalUserRegForm,premiumUserRegForm,userLoginForm,searchForStoreForm,searchForProductForm,publishAdvertisementForm,InventoryForm
-
+#Import message lib
+from django.contrib import messages
+#Set global variable
+generalUserID = 0
+premiumUserID = 0
 
 def home(request):
     """Renders the home page."""
@@ -30,30 +40,69 @@ def home(request):
 def generalUserReg(request):
     assert isinstance(request, HttpRequest)
     if request.method == 'POST':  
-            f = generalUserRegForm(request.POST)
-            if f.is_valid():     
+        f = generalUserRegForm(request.POST)
+        if f.is_valid():
+            if (f.cleaned_data.get('General_User_Password') == f.cleaned_data.get('General_User_Password_Confirm')):     
                 userName = f.cleaned_data.get('General_User_Name')
-                password = f.cleaned_data.get('General_User_Password')   
-                Email = f.cleaned_data.get('Email')
-                return HttpResponseRedirect('app/login/')
-            else:
-                return render(
+                password = f.cleaned_data.get('General_User_Password')               
+                email = f.cleaned_data.get('Email')
+                #Encode password
+                bPassword = password.encode()
+                ePassword = hashlib.sha512()
+                ePassword.update(bPassword)
+                encryptedPassword = ePassword.digest()                
+                try:
+                    global generalUserID
+                    generalUserID +=1
+                    genUser = General_User.objects.create(General_User_ID = generalUserID, General_User_Name = userName,General_User_Password = encryptedPassword, Email = email)
+
+                except: # catch *all* exceptions
+                    messages.error(request,  sys.exc_info()[0])
+                    return render(
                         request,
-                          'app/GeneralUserRegister.html',
-                          {
-                              'generalUserRegForm':f,
-                              'year':datetime.now().year,
-                          }
-                        )          
+                            'app/GeneralUserRegister.html',
+                            {
+                                'generalUserRegForm':f,
+                                'year':datetime.now().year,
+                            }
+                        )  
+                messages.success(request, 'User successfully created and logged in!')
+                return render(                    
+                            request,
+                            'app/index.html',
+                            {
+                                'title':'Home Page',
+                                'year':datetime.now().year,
+                            }
+                        )         
+            else:
+                messages.error(request, 'Confirm password entered does not match with password entered!')
+                return render(
+                    request,
+                        'app/GeneralUserRegister.html',
+                        {
+                            'generalUserRegForm':f,
+                            'year':datetime.now().year,
+                        }
+                    )             
+        else:
+            return render(
+                    request,
+                        'app/GeneralUserRegister.html',
+                        {
+                            'generalUserRegForm':f,
+                            'year':datetime.now().year,
+                        }
+                    )          
     else:
         f = generalUserRegForm()
         return render(
                 request,
-                      'app/GeneralUserRegister.html',
-                      {
-                          'generalUserRegForm':f,
-                          'year':datetime.now().year,
-                      }
+                        'app/GeneralUserRegister.html',
+                        {
+                            'generalUserRegForm':f,
+                            'year':datetime.now().year,
+                        }
                     )
 
 
@@ -62,14 +111,54 @@ def premiumUserReg(request):
     assert isinstance(request, HttpRequest)
     if request.method == 'POST':  
                 f = premiumUserRegForm(request.POST)
-                if f.is_valid():     
-                    userName = f.cleaned_data.get('Premium_User_Name')
-                    password = f.cleaned_data.get('Premium_User_Password')                     
-                    Email = f.cleaned_data.get('Email')
-                    StoreName =  f.cleaned_data.get('Store_Name')
-                    Address = f.cleaned_data.get('Address')
-                    Zip = f.cleaned_data.get('Zip')
-                    return HttpResponseRedirect('app/login/')
+                if f.is_valid():
+                    if (f.cleaned_data.get('Premium_User_Password') == f.cleaned_data.get('Premium_User_Password_Confirm')):
+                        userName = f.cleaned_data.get('Premium_User_Name')
+                        password = f.cleaned_data.get('Premium_User_Password')                     
+                        email = f.cleaned_data.get('Email')
+                        StoreName =  f.cleaned_data.get('Store_Name')
+                        Address = f.cleaned_data.get('Address')
+                        Zip = f.cleaned_data.get('Zip')
+                        Phone = f.cleaned_data.get('Phone')
+                         #Encode password
+                        bPassword = password.encode()
+                        ePassword = hashlib.sha512()
+                        ePassword.update(bPassword)
+                        encryptedPassword = ePassword.digest()                
+                        try:
+                            global premiumUserID
+                            premiumUserID +=1
+                            premiumUser = Premium_User.objects.create(Premium_User_ID = premiumUserID, Premium_User_Name = userName,Premium_User_Password = encryptedPassword,
+                                                                      Email = email, Store_Name = StoreName,Store_Address = Address, Store_Zip = Zip, Store_Phone = Phone)
+                        except: # catch *all* exceptions
+                            messages.error(request,  sys.exc_info()[0])
+                            return render(
+                                request,
+                                    'app/PremiumUserRegister.html',
+                                    {
+                                        'premiumUserRegForm':f,
+                                        'year':datetime.now().year,
+                                    }
+                                )
+                        messages.success(request, 'Premium User successfully created and logged in!')
+                        return render(                    
+                                    request,
+                                    'app/PremiumUserDashboard.html',
+                                    {
+                                        'title':'Premium User Dashboard',
+                                        'year':datetime.now().year,
+                                    }
+                                )
+                    else:
+                        messages.error(request, 'Confirm password entered does not match with password entered!')
+                        return render(
+                            request,
+                                'app/PremiumUserRegister.html',
+                                {
+                                    'premiumUserRegForm':f,
+                                    'year':datetime.now().year,
+                                }
+                            )               
                 else:
                     return render(
                                 request,
@@ -93,30 +182,57 @@ def premiumUserReg(request):
 def userLogin(request):
     assert isinstance(request, HttpRequest)
     if request.method == 'POST':  
-                f = userLoginForm(request.POST)
-                if f.is_valid():     
-                    userName = f.cleaned_data.get('User_Name')
-                    password = f.cleaned_data.get('User_Password')   
-                    #TODO: Add checking condition if it is Premium user or General user login.
-                    #If Premium User Login go to PremiumUserDashboard.html
-                    return HttpResponseRedirect('PremiumUserDashboard.html')#TODO: Search page or update information page
-                    #If General User Login go to GeneralUserDashboard.html
-                    #return HttpResponseRedirect('PremiumUserDashboard.html')#TODO: Search page or update information page
+        f = userLoginForm(request.POST)
+        if f.is_valid():     
+            userName = f.cleaned_data.get('User_Name')
+            password = f.cleaned_data.get('User_Password') 
+            #Encode password
+            bPassword = password.encode()
+            ePassword = hashlib.sha512()
+            ePassword.update(bPassword)
+            encryptedPassword = ePassword.digest()  
+            #TODO: Add checking condition if it is Premium user or General user login.
+            try:
+                genUser = General_User.objects.filter(General_User_Name = userName,General_User_Password = encryptedPassword)
+                if genUser:
+                    messages.success(request, 'General User successfully logged in!')
+                    return HttpResponseRedirect('/')
                 else:
-                    return render(
-                                request,
-                                'app/login.html',
-                                {
-                                    'userLoginForm':f,
-                                    'year':datetime.now().year
-                                }
-                            )          
+                    #If Premium User Login go to PremiumUserDashboard.html
+                    try:
+                        premUser = Premium_User.objects.filter(Premium_User_Name = userName, Premium_User_Password = encryptedPassword)
+                        if premUser:
+                            messages.success(request, 'User successfully logged in!')
+                            return HttpResponseRedirect('PremiumUserDashboard.html')#TODO: Search page or update information page
+                        else:
+                            messages.success(request, 'User not found')
+                            return HttpResponseRedirect('login.html')
+            
+                    except:
+                        messages.error(request,  sys.exc_info()[0])
+                        return HttpResponseRedirect('login.html')
+                           
+            except:
+                messages.error(request,  sys.exc_info()[0])
+                return HttpResponseRedirect('login.html')
+            
+        else:
+            return render(
+                        request,
+                        'app/login.html',
+                        {
+                            'LoginErrorMessage':'User name and password does not match!',
+                            'userLoginForm':f,
+                            'year':datetime.now().year
+                        }
+                    )          
     else:
         f = userLoginForm()
         return render(
                     request,
                     'app/login.html',
                     {
+                        'LoginErrorMessage':'',
                         'userLoginForm':f,
                         'year':datetime.now().year
                     }

@@ -2,16 +2,30 @@
 
 {% block content %}
 
+
+
 <div class="jumbotron">
     <h2>Log in</h2>
 </div>
+
+{% if messages %}
+    <div class="row">
+        
+    <div class="col-md-12">
+        {% for message in messages %}
+        <p style="color: red;" {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+        {% endfor %}
+    </div>
+
+    </div>
+{% endif %}
 
 <body>
     <div class="row">
         <div class="col-md-3"></div>
             <div class="col-md-6">
                 <p style="color: red;">
-                    User name and password doesn't match.
+                    {{LoginErrorMessage}}
                 </p>
                 {% if userLoginForm.errors %}
                 <p style="color: red;">

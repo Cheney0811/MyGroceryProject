@@ -22,7 +22,7 @@ class Premium_User(models.Model):
 class General_User(models.Model):
     General_User_ID = models.IntegerField(primary_key = True)
     General_User_Name = models.CharField(null = False, max_length = 10)
-    General_User_Password = models.BinaryField(null = False)
+    #General_User_Password = models.BinaryField(null = False)
     Email = models.EmailField(null = False)
 
 class Product_List(models.Model):

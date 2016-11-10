@@ -13,6 +13,9 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.forms.formsets import formset_factory
 import sys
+#Django Authndication
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 #Hash lib import
 import hashlib
 #Import models py
@@ -46,16 +49,16 @@ def generalUserReg(request):
                 userName = f.cleaned_data.get('General_User_Name')
                 password = f.cleaned_data.get('General_User_Password')               
                 email = f.cleaned_data.get('Email')
-                #Encode password
-                bPassword = password.encode()
-                ePassword = hashlib.sha512()
-                ePassword.update(bPassword)
-                encryptedPassword = ePassword.digest()                
+                ##Encode password
+                #bPassword = password.encode()
+                #ePassword = hashlib.sha512()
+                #ePassword.update(bPassword)
+                #encryptedPassword = ePassword.digest()                
                 try:
                     global generalUserID
                     generalUserID +=1
-                    genUser = General_User.objects.create(General_User_ID = generalUserID, General_User_Name = userName,General_User_Password = encryptedPassword, Email = email)
-
+                    genUser = General_User.objects.create(General_User_ID = generalUserID, General_User_Name = userName, Email = email)
+                    genAuthUser = User.objects.create_user(userName,email, password);
                 except: # catch *all* exceptions
                     messages.error(request,  sys.exc_info()[0])
                     return render(
@@ -65,16 +68,17 @@ def generalUserReg(request):
                                 'generalUserRegForm':f,
                                 'year':datetime.now().year,
                             }
-                        )  
-                messages.success(request, 'User successfully created and logged in!')
-                return render(                    
-                            request,
-                            'app/index.html',
-                            {
-                                'title':'Home Page',
-                                'year':datetime.now().year,
-                            }
-                        )         
+                        )
+                if genAuthUser:  
+                    messages.success(request, 'User successfully created and logged in!')
+                    return render(                    
+                                request,
+                                'app/index.html',
+                                {
+                                    'title':'Home Page',
+                                    'year':datetime.now().year,
+                                }
+                            )         
             else:
                 messages.error(request, 'Confirm password entered does not match with password entered!')
                 return render(
@@ -185,16 +189,20 @@ def userLogin(request):
         f = userLoginForm(request.POST)
         if f.is_valid():     
             userName = f.cleaned_data.get('User_Name')
-            password = f.cleaned_data.get('User_Password') 
-            #Encode password
-            bPassword = password.encode()
-            ePassword = hashlib.sha512()
-            ePassword.update(bPassword)
-            encryptedPassword = ePassword.digest()  
+            passWord = f.cleaned_data.get('User_Password') 
+            ##Encode password
+            #bPassword = password.encode()
+            #ePassword = hashlib.sha512()
+            #ePassword.update(bPassword)
+            #encryptedPassword = ePassword.digest()  
             #TODO: Add checking condition if it is Premium user or General user login.
             try:
-                genUser = General_User.objects.filter(General_User_Name = userName,General_User_Password = encryptedPassword)
-                if genUser:
+                #genUser = General_User.objects.filter(General_User_Name = userName,General_User_Password = encryptedPassword)
+                #if genUser:
+                #    messages.success(request, 'General User successfully logged in!')
+                #    return HttpResponseRedirect('/')
+                genAuthUser = authenticate(username = userName,password = passWord)
+                if genAuthUser:
                     messages.success(request, 'General User successfully logged in!')
                     return HttpResponseRedirect('/')
                 else:

@@ -15,7 +15,10 @@ from django.forms.formsets import formset_factory
 import sys
 #Django Authndication
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate,login
+#Import user group lib
+from django.contrib.auth.models import Permission,Group
+
 #Hash lib import
 import hashlib
 #Import models py
@@ -24,9 +27,8 @@ from app.models import *
 from app.forms import generalUserRegForm,premiumUserRegForm,userLoginForm,searchForStoreForm,searchForProductForm,publishAdvertisementForm,InventoryForm
 #Import message lib
 from django.contrib import messages
-#Set global variable
-generalUserID = 0
-premiumUserID = 0
+
+
 
 def home(request):
     """Renders the home page."""
@@ -48,17 +50,13 @@ def generalUserReg(request):
             if (f.cleaned_data.get('General_User_Password') == f.cleaned_data.get('General_User_Password_Confirm')):     
                 userName = f.cleaned_data.get('General_User_Name')
                 password = f.cleaned_data.get('General_User_Password')               
-                email = f.cleaned_data.get('Email')
-                ##Encode password
-                #bPassword = password.encode()
-                #ePassword = hashlib.sha512()
-                #ePassword.update(bPassword)
-                #encryptedPassword = ePassword.digest()                
+                email = f.cleaned_data.get('Email')             
                 try:
-                    global generalUserID
-                    generalUserID +=1
-                    genUser = General_User.objects.create(General_User_ID = generalUserID, General_User_Name = userName, Email = email)
+                    genUser = General_User.objects.create(General_User_Name = userName, Email = email)
                     genAuthUser = User.objects.create_user(userName,email, password);
+                    group = Group.objects.get(name='generalUser')
+                    genAuthUser.groups.add(group)
+                    genAuthUser.save()
                 except: # catch *all* exceptions
                     messages.error(request,  sys.exc_info()[0])
                     return render(
@@ -123,17 +121,14 @@ def premiumUserReg(request):
                         StoreName =  f.cleaned_data.get('Store_Name')
                         Address = f.cleaned_data.get('Address')
                         Zip = f.cleaned_data.get('Zip')
-                        Phone = f.cleaned_data.get('Phone')
-                         #Encode password
-                        bPassword = password.encode()
-                        ePassword = hashlib.sha512()
-                        ePassword.update(bPassword)
-                        encryptedPassword = ePassword.digest()                
+                        Phone = f.cleaned_data.get('Phone')                                   
                         try:
-                            global premiumUserID
-                            premiumUserID +=1
-                            premiumUser = Premium_User.objects.create(Premium_User_ID = premiumUserID, Premium_User_Name = userName,Premium_User_Password = encryptedPassword,
+                            premUser = Premium_User.objects.create(Premium_User_Name = userName,
                                                                       Email = email, Store_Name = StoreName,Store_Address = Address, Store_Zip = Zip, Store_Phone = Phone)
+                            premAuthUser = User.objects.create_user(userName,email, password);
+                            group = Group.objects.get(name='premiumUser')
+                            premAuthUser.groups.add(group)
+                            premAuthUser.save()
                         except: # catch *all* exceptions
                             messages.error(request,  sys.exc_info()[0])
                             return render(
@@ -190,35 +185,26 @@ def userLogin(request):
         if f.is_valid():     
             userName = f.cleaned_data.get('User_Name')
             passWord = f.cleaned_data.get('User_Password') 
-            ##Encode password
-            #bPassword = password.encode()
-            #ePassword = hashlib.sha512()
-            #ePassword.update(bPassword)
-            #encryptedPassword = ePassword.digest()  
-            #TODO: Add checking condition if it is Premium user or General user login.
-            try:
-                #genUser = General_User.objects.filter(General_User_Name = userName,General_User_Password = encryptedPassword)
-                #if genUser:
-                #    messages.success(request, 'General User successfully logged in!')
-                #    return HttpResponseRedirect('/')
-                genAuthUser = authenticate(username = userName,password = passWord)
-                if genAuthUser:
-                    messages.success(request, 'General User successfully logged in!')
-                    return HttpResponseRedirect('/')
+           
+            try:               
+                AuthUser = authenticate(username = userName,password = passWord)
+                if AuthUser:
+                    login(request,AuthUser)
+
+                    #Check which group the user belongs to
+                    user_in_GeneralGroup = Group.objects.get(name='generalUser').user_set.all()
+                    user_in_PremiumGroup = Group.objects.get(name='premiumUser').user_set.all()
+
+                    if AuthUser in user_in_GeneralGroup:
+                        messages.success(request, 'General User successfully logged in!')
+                        return HttpResponseRedirect('/')
+                    elif AuthUser in user_in_PremiumGroup:                       
+                        messages.success(request, 'Premium User successfully logged in!')
+                        return HttpResponseRedirect('PremiumUserDashboard.html')#TODO: Search page or update information page
                 else:
-                    #If Premium User Login go to PremiumUserDashboard.html
-                    try:
-                        premUser = Premium_User.objects.filter(Premium_User_Name = userName, Premium_User_Password = encryptedPassword)
-                        if premUser:
-                            messages.success(request, 'User successfully logged in!')
-                            return HttpResponseRedirect('PremiumUserDashboard.html')#TODO: Search page or update information page
-                        else:
-                            messages.success(request, 'User not found')
-                            return HttpResponseRedirect('login.html')
-            
-                    except:
-                        messages.error(request,  sys.exc_info()[0])
-                        return HttpResponseRedirect('login.html')
+                    messages.success(request, 'User not found')
+                    return HttpResponseRedirect('login.html')        
+                   
                            
             except:
                 messages.error(request,  sys.exc_info()[0])
@@ -252,7 +238,28 @@ def searchStores(request):
                 f = searchForStoreForm(request.POST)
                 if f.is_valid():     
                     zip = f.cleaned_data.get('Search_Zip') 
-                    return HttpResponseRedirect('app/searchForStores.html')#TODO: Search page or update information page
+                    Qurery_Results = Premium_User.objects.filter(Store_Zip = zip)
+
+                    if Qurery_Results:
+                        return render(
+                                    request,
+                                    'app/searchForStores.html',
+                                    {
+                                        'searchForStoreForm':f,
+                                        'query_results':Qurery_Results,
+                                        'year':datetime.now().year
+                                    }
+                                )  
+                    else:
+                        messages.error(request,  "No Store found!") 
+                        return render(
+                                request,
+                                'app/searchForStores.html',
+                                {
+                                    'searchForStoreForm':f,
+                                    'year':datetime.now().year
+                                }
+                            )
                 else:
                     return render(
                                 request,
@@ -278,8 +285,42 @@ def searchProduct(request):
     if request.method == 'POST':  
                 f = searchForProductForm(request.POST)
                 if f.is_valid():     
-                    product_name = f.cleaned_data.get('Product_Name') 
-                    return HttpResponseRedirect('searchForProduct.html')#TODO: Search page or update information page
+                    product_name = f.cleaned_data.get('Product_Name')                    
+
+                    if Product.objects.filter(Product_Name = product_name).exists():
+                        product_item = Product.objects.get(Product_Name = product_name)
+                        Qurery_Results = Product_List.objects.filter(product = product_item)
+
+                        if Qurery_Results:
+                            return render(
+                                        request,
+                                        'app/searchForProduct.html',
+                                        {
+                                            'searchForProductForm':f,
+                                            'query_results':Qurery_Results,
+                                            'year':datetime.now().year
+                                        }
+                                    )  
+                        else:
+                            messages.error(request,  "No Product found!") 
+                            return render(
+                                    request,
+                                    'app/searchForProduct.html',
+                                    {
+                                        'searchForProductForm':f,
+                                        'year':datetime.now().year
+                                    }
+                                ) 
+                    else:
+                            messages.error(request,  "No Product found!") 
+                            return render(
+                                    request,
+                                    'app/searchForProduct.html',
+                                    {
+                                        'searchForProductForm':f,
+                                        'year':datetime.now().year
+                                    }
+                                )
                 else:
                     return render(
                                 request,
@@ -318,12 +359,40 @@ def PremiumUserUpdateInventory(request):
 
     if request.method == 'POST':
         childrenFormset = Inventory_FormSet(request.POST)
-
+        
         # check whether it's valid:
         if childrenFormset.is_valid():
-            childrenFormset.save()
+            #Populate the formset into database
+            for form in childrenFormset:
+                premium_user = Premium_User.objects.get(Premium_User_Name = request.user.username, Email = request.user.email)
+                Name =  form.cleaned_data.get('Item_Name') 
+                Quantity = form.cleaned_data.get('Item_Quantity') 
+                Price = form.cleaned_data.get('Item_Price')
+                try:                    
+                    #Create the product item if it was not there
+                    if Product.objects.filter(Product_Name = Name).exists():
+                        product_item = Product.objects.get(Product_Name = Name)
+                    else:
+                        product_item = Product.objects.create(Product_Name = Name)
 
-            # redirect to the edit url (eventually will be to the view URL)
+                    #Create the product list if it was not there
+                    if Product_List.objects.filter(premium_user = premium_user, product = product_item).exists():
+                        productList_item = Product_List.objects.get(premium_user = premium_user, product = product_item)
+                        productList_item.quantity = Quantity
+                        productList_item.price = Price
+                        productList_item.save()
+                    else:
+                        productList_item = Product_List.objects.create(premium_user = premium_user, product = product_item,quantity = Quantity, price = Price)
+                   
+                except: # catch *all* exceptions
+                    messages.error(request,  sys.exc_info()[0])
+                    return render(request, 'app/PremiumUserUpdateInventory.html', 
+                                    { 
+                                        'InventoryFormSet' : childrenFormset, 
+                                        'year' : datetime.now().year, 
+                                        'title': "Add/Edit Inventory Items"
+                                        })
+            messages.success(request,  "Inventory successfully updated!")
             return HttpResponseRedirect('PremiumUserUpdateInventory.html')
         else:
              print (childrenFormset.errors)

@@ -10,9 +10,10 @@
     <div class="row">
         <div class="col-md-3"></div>
             <div class="col-md-6">
-                 <p style="color: red;">
-                    No store was found!
-                </p>
+                 {% for message in messages %}
+                <p style="color: red;" {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                {% endfor %}
+
                 {% if searchForStoreForm.errors %}
                 <p style="color: red;">
                     Correct the following errors {{ searchForStoreForm.errors|pluralize }}.
@@ -39,10 +40,12 @@
                   </tr>
                 </thead>
                 <tbody>
+                   {% for item in query_results %}
                    <tr>
-                    <td width=30%>Ames Asian Mart</td>
-                    <td width=70%>Lincoln way</td>
-                  </tr>
+                    <td width=30%>{{item.Store_Name}}</td>
+                    <td width=70%>{{item.Store_Address}}</td>
+                   </tr>
+                   {% endfor %}
                 </tbody>
               </table>
         <div class="col-md-2"></div>

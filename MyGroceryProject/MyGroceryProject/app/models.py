@@ -27,21 +27,14 @@ class Product_List(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(null = False)
     price = models.DecimalField(null = False, max_digits=5, decimal_places=2)
-    unique_together = ("premium_user","product")
 
 class Advertisement(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    premium_user = models.ForeignKey(Premium_User, on_delete=models.CASCADE)
+    mime_Type = models.CharField(max_length=128)
     time_of_post = models.TimeField(null = False)
-    date_of_start = models.DateTimeField(null = False)
-    date_of_end = models.DateTimeField(null = False)
-    advertisement_concent = models.TextField()
-    unique_together = ("product","premium_User","time_of_post")
+    advertisement_concent = models.BinaryField()
 
 class Advertisement_List(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    advertisement = models.ForeignKey(Advertisement, on_delete=models.CASCADE)
     premium_user = models.ForeignKey(Premium_User, on_delete=models.CASCADE)
-    receiver = models.IntegerField(General_User)
-    time_of_post = models.TimeField(null = False)
    
-    unique_together = ("product","premium_user","receiver","time_of_post")

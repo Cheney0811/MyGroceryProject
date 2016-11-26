@@ -46,7 +46,7 @@ class searchForProductForm(forms.Form):
 
 class publishAdvertisementForm(forms.Form):
     AD_Subject = forms.CharField(label = 'Product Name', max_length = 10)
-    AD_Content = forms.FileField()
+    AD_Content = forms.FileField(label = 'Upload Poster')
 
 
 class InventoryForm(forms.Form):

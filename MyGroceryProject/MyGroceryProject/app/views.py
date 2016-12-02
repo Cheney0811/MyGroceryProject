@@ -58,7 +58,7 @@ def generalUserReg(request):
                 email = f.cleaned_data.get('Email')             
                 try:
                     genUser = General_User.objects.create(General_User_Name = userName, Email = email)
-                    genAuthUser = User.objects.create_user(userName,email, password);
+                    genAuthUser = User.objects.create_user(userName,email, password)
                     group = Group.objects.get(name='generalUser')
                     genAuthUser.groups.add(group)
                     genAuthUser.save()
@@ -207,7 +207,7 @@ def userLogin(request):
                         messages.success(request, 'Premium User successfully logged in!')
                         return HttpResponseRedirect('PremiumUserDashboard.html')#TODO: Search page or update information page
                 else:
-                    messages.success(request, 'User not found')
+                    messages.error(request, 'User not found!')
                     return HttpResponseRedirect('login.html')        
                    
                            
@@ -361,58 +361,64 @@ def PremiumUserUpdateInventory(request):
     assert isinstance(request, HttpRequest)
     
     Inventory_FormSet = formset_factory(InventoryForm)
+    user_in_PremiumGroup = Group.objects.get(name='premiumUser').user_set.all()
+    AuthUser = request.user
 
-    if request.method == 'POST':
-        childrenFormset = Inventory_FormSet(request.POST)
+    if AuthUser in user_in_PremiumGroup:
+        if request.method == 'POST':
+            childrenFormset = Inventory_FormSet(request.POST)
         
-        # check whether it's valid:
-        if childrenFormset.is_valid():
-            #Populate the formset into database
-            for form in childrenFormset:
-                premium_User = Premium_User.objects.get(Premium_User_Name = request.user.username, Email = request.user.email)
-                Name =  form.cleaned_data.get('Item_Name') 
-                Quantity = form.cleaned_data.get('Item_Quantity') 
-                Price = form.cleaned_data.get('Item_Price')
-                try:                    
-                    #Create the product item if it was not there
-                    if Product.objects.filter(Product_Name = Name).exists():
-                        product_item = Product.objects.get(Product_Name = Name)
-                    else:
-                        product_item = Product.objects.create(Product_Name = Name)
+            # check whether it's valid:
+            if childrenFormset.is_valid():
+                #Populate the formset into database
+                for form in childrenFormset:
+                    premium_User = Premium_User.objects.get(Premium_User_Name = request.user.username, Email = request.user.email)
+                    Name =  form.cleaned_data.get('Item_Name') 
+                    Quantity = form.cleaned_data.get('Item_Quantity') 
+                    Price = form.cleaned_data.get('Item_Price')
+                    try:                    
+                        #Create the product item if it was not there
+                        if Product.objects.filter(Product_Name = Name).exists():
+                            product_item = Product.objects.get(Product_Name = Name)
+                        else:
+                            product_item = Product.objects.create(Product_Name = Name)
 
-                    #Create the product list if it was not there
-                    if Product_List.objects.filter(premium_user = premium_User, product = product_item).exists():
-                        productList_item = Product_List.objects.get(premium_user = premium_User, product = product_item)
-                        productList_item.quantity = Quantity
-                        productList_item.price = Price
-                        productList_item.save()
-                    else:
-                        productList_item = Product_List.objects.create(premium_user = premium_User, product = product_item,quantity = Quantity, price = Price)
+                        #Create the product list if it was not there
+                        if Product_List.objects.filter(premium_user = premium_User, product = product_item).exists():
+                            productList_item = Product_List.objects.get(premium_user = premium_User, product = product_item)
+                            productList_item.quantity = Quantity
+                            productList_item.price = Price
+                            productList_item.save()
+                        else:
+                            productList_item = Product_List.objects.create(premium_user = premium_User, product = product_item,quantity = Quantity, price = Price)
                    
-                except: # catch *all* exceptions
-                    messages.error(request,  sys.exc_info()[0])
-                    return render(request, 'app/PremiumUserUpdateInventory.html', 
-                                    { 
-                                        'InventoryFormSet' : childrenFormset, 
-                                        'year' : datetime.now().year, 
-                                        'title': "Add/Edit Inventory Items"
-                                        })
-            messages.success(request,  "Inventory successfully updated!")
-            return HttpResponseRedirect('PremiumUserUpdateInventory.html')
-        else:
-             print (childrenFormset.errors)
+                    except: # catch *all* exceptions
+                        messages.error(request,  sys.exc_info()[0])
+                        return render(request, 'app/PremiumUserUpdateInventory.html', 
+                                        { 
+                                            'InventoryFormSet' : childrenFormset, 
+                                            'year' : datetime.now().year, 
+                                            'title': "Add/Edit Inventory Items"
+                                            })
+                messages.success(request,  "Inventory successfully updated!")
+                return HttpResponseRedirect('PremiumUserUpdateInventory.html')
+            else:
+                 print (childrenFormset.errors)
 
-    # if a GET 
-    else:
-        childrenFormset = Inventory_FormSet()
+        # if a GET 
+        else:
+            childrenFormset = Inventory_FormSet()
         
 
-    return render(request, 'app/PremiumUserUpdateInventory.html', 
-        { 
-            'InventoryFormSet' : childrenFormset, 
-            'year' : datetime.now().year, 
-            'title': "Add/Edit Inventory Items"
-            })
+        return render(request, 'app/PremiumUserUpdateInventory.html', 
+            { 
+                'InventoryFormSet' : childrenFormset, 
+                'year' : datetime.now().year, 
+                'title': "Add/Edit Inventory Items"
+                })
+    else:
+        messages.error(request, 'Not permitted!')
+        return HttpResponseRedirect('/')
 
 def PremiumUserPublishAD(request):
     assert isinstance(request, HttpRequest)

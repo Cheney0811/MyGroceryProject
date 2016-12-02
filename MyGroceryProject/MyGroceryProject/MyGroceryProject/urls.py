@@ -5,7 +5,6 @@ Definition of urls for MyGroceryProject.
 from datetime import datetime
 from django.conf.urls import url
 import django.contrib.auth.views
-
 import app.forms
 import app.views
 
@@ -19,7 +18,8 @@ urlpatterns = [
     url(r'^$', app.views.home, name='home'),
     url(r'^GeneralUserRegister', app.views.generalUserReg, name = 'GeneralUserReg'),
     url(r'^PremiumUserRegister', app.views.premiumUserReg, name = 'PremiumUserReg'),
-    url(r'^app/login',  app.views.userLogin, name = 'LogIn'),  
+    url(r'^app/login',  app.views.userLogin, name = 'LogIn'),
+    url(r'^logout/$', django.contrib.auth.views.logout, {'next_page': '/'}, name='LogOut'),
     url(r'^app/PremiumUserDashboard',  app.views.PremiumDashboardLogedIn, name = 'PremumUserDashboard'),     
     url(r'^app/PremiumUserUpdateInventory',  app.views.PremiumUserUpdateInventory, name = 'PremiumUserUpdateInventory'),
     url(r'^app/PremiumUserPublishAD',  app.views.PremiumUserPublishAD, name = 'PremiumUserPublishAD'),

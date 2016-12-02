@@ -20,22 +20,14 @@ class BootstrapAuthenticationForm(AuthenticationForm):
 
 class generalUserRegForm(forms.Form):
     General_User_Name = forms.CharField(label = 'User Name', max_length = 10)
-    General_User_Password = forms.CharField(label = 'Password', max_length = 20 , widget=forms.PasswordInput({
-                                   'class': 'form-control',
-                                   'placeholder':'Password'}))
-    General_User_Password_Confirm = forms.CharField(label = 'Confirm Password', max_length = 20, widget=forms.PasswordInput({
-                                   'class': 'form-control',
-                                   'placeholder':'Password'}))
+    General_User_Password = forms.CharField(label = 'Password', max_length = 20 , widget=forms.PasswordInput({'placeholder':'Password'}))
+    General_User_Password_Confirm = forms.CharField(label = 'Confirm Password', max_length = 20, widget=forms.PasswordInput({'placeholder':'Password'}))
     Email = forms.EmailField(label = 'E-Mail')
 
 class premiumUserRegForm(forms.Form):
     Premium_User_Name = forms.CharField(label = 'User Name', max_length = 10)
-    Premium_User_Password = forms.CharField(label = 'Password', max_length = 20, widget=forms.PasswordInput({
-                                   'class': 'form-control',
-                                   'placeholder':'Password'}))
-    Premium_User_Password_Confirm = forms.CharField(label = 'Confirm Password', max_length = 20, widget=forms.PasswordInput({
-                                   'class': 'form-control',
-                                   'placeholder':'Password'}))
+    Premium_User_Password = forms.CharField(label = 'Password', max_length = 20, widget=forms.PasswordInput({'placeholder':'Password'}))
+    Premium_User_Password_Confirm = forms.CharField(label = 'Confirm Password', max_length = 20, widget=forms.PasswordInput({'placeholder':'Password'}))
     Email = forms.EmailField(label = 'E-Mail')
     Store_Name = forms.CharField(label = 'Store Name', max_length = 10)
     Address = forms.CharField(label = 'Store Address')
@@ -44,9 +36,7 @@ class premiumUserRegForm(forms.Form):
 
 class userLoginForm(forms.Form):
     User_Name = forms.CharField(label = 'User Name', max_length = 10)
-    User_Password = forms.CharField(label = 'Password', max_length = 20, widget=forms.PasswordInput({
-                                   'class': 'form-control',
-                                   'placeholder':'Password'}))
+    User_Password = forms.CharField(label = 'Password', max_length = 20, widget=forms.PasswordInput({'placeholder':'Password'}))
 
 class searchForStoreForm(forms.Form):
     Search_Zip = forms.CharField(label = 'Zip Code', max_length = 11)

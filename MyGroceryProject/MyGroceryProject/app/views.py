@@ -182,7 +182,7 @@ def userLogin(request):
         if f.is_valid():     
             userName = f.cleaned_data.get('User_Name')
             passWord = f.cleaned_data.get('User_Password') 
-           
+            request.session.get_expire_at_browser_close()
             try:               
                 AuthUser = authenticate(username = userName,password = passWord)
                 if AuthUser:
@@ -414,66 +414,12 @@ def PremiumUserUpdateInventory(request):
 
 def PremiumUserPublishAD(request):
     assert isinstance(request, HttpRequest)
+    user_in_PremiumGroup = Group.objects.get(name='premiumUser').user_set.all()
+    AuthUser = request.user
 
-    if request.method == 'GET':
-        f = publishAdvertisementForm
-        return render(
-                    request,
-                    'app/PremiumUserPublishAD.html',
-                    {
-                        'publishAdvertisementForm':f,
-                        'year':datetime.now().year
-                    }
-                )
-    else: #POST
-        f = publishAdvertisementForm(request.POST, request.FILES)
-        if f.is_valid():     
-            Subject = f.cleaned_data.get('AD_Subject')            
-            File = f.cleaned_data.get('AD_Content')             
-
-            if Product.objects.filter(Product_Name = Subject).exists():
-                premium_User = Premium_User.objects.get(Premium_User_Name = request.user.username, Email = request.user.email)
-                Ad_product = Product.objects.get(Product_Name = Subject)
-                bytes=File.read() #read binary
-                #Upload poster to the database
-                myAdvertisement = Advertisement.objects.create(product = Ad_product, advertisement_concent = bytes, mime_Type = File.content_type,time_of_post = datetime.utcnow()) 
-                myAdvertisement.save()
-                Advertisement_List.objects.create(advertisement = myAdvertisement, premium_user = premium_User)
-
-                #Send advertisement to general user as email
-                subject = 'MyGrocery Advertisement'
-                message = 'Special Today'  
-                from_email = 'MyGrocery@iastate.com'
-                recipient_list = [] 
-
-                user_in_GeneralGroup = Group.objects.get(name='generalUser').user_set.all()
-                for receiver in user_in_GeneralGroup:                               
-                    recipient_list.append(receiver.email) 
-                               
-                email = EmailMessage(subject,message,from_email,recipient_list)
-                email.attach(File.name,bytes,File.content_type)
-                email.send()
-                    
-                messages.success(request,  "Advertisement successfully published!")                     
-                return render(
-                            request,
-                            'app/PremiumUserPublishAD.html',
-                            {
-                                'publishAdvertisementForm':f,
-                                'year':datetime.now().year
-                            }
-                        )
-            else:
-                messages.error(request,  "Item not found in the inventory, add this item first!")                     
-                return render(
-                            request,
-                            'app/PremiumUserPublishAD.html',
-                            {
-                                'publishAdvertisementForm':f,
-                                'year':datetime.now().year
-                            }
-                        )
-        else:
+    if AuthUser in user_in_PremiumGroup:
+        if request.method == 'GET':
+            f = publishAdvertisementForm
             return render(
                         request,
                         'app/PremiumUserPublishAD.html',
@@ -481,5 +427,65 @@ def PremiumUserPublishAD(request):
                             'publishAdvertisementForm':f,
                             'year':datetime.now().year
                         }
-                    )          
+                    )
+        else: #POST
+            f = publishAdvertisementForm(request.POST, request.FILES)
+            if f.is_valid():     
+                Subject = f.cleaned_data.get('AD_Subject')            
+                File = f.cleaned_data.get('AD_Content')             
+
+                if Product.objects.filter(Product_Name = Subject).exists():
+                    premium_User = Premium_User.objects.get(Premium_User_Name = request.user.username, Email = request.user.email)
+                    Ad_product = Product.objects.get(Product_Name = Subject)
+                    bytes=File.read() #read binary
+                    #Upload poster to the database
+                    myAdvertisement = Advertisement.objects.create(product = Ad_product, advertisement_concent = bytes, mime_Type = File.content_type,time_of_post = datetime.utcnow()) 
+                    myAdvertisement.save()
+                    Advertisement_List.objects.create(advertisement = myAdvertisement, premium_user = premium_User)
+
+                    #Send advertisement to general user as email
+                    subject = 'MyGrocery Advertisement'
+                    message = 'Special Today'  
+                    from_email = 'MyGrocery@iastate.com'
+                    recipient_list = [] 
+
+                    user_in_GeneralGroup = Group.objects.get(name='generalUser').user_set.all()
+                    for receiver in user_in_GeneralGroup:                               
+                        recipient_list.append(receiver.email) 
+                               
+                    email = EmailMessage(subject,message,from_email,recipient_list)
+                    email.attach(File.name,bytes,File.content_type)
+                    email.send()
+                    
+                    messages.success(request,  "Advertisement successfully published!")                     
+                    return render(
+                                request,
+                                'app/PremiumUserPublishAD.html',
+                                {
+                                    'publishAdvertisementForm':f,
+                                    'year':datetime.now().year
+                                }
+                            )
+                else:
+                    messages.error(request,  "Item not found in the inventory, add this item first!")                     
+                    return render(
+                                request,
+                                'app/PremiumUserPublishAD.html',
+                                {
+                                    'publishAdvertisementForm':f,
+                                    'year':datetime.now().year
+                                }
+                            )
+            else:
+                return render(
+                            request,
+                            'app/PremiumUserPublishAD.html',
+                            {
+                                'publishAdvertisementForm':f,
+                                'year':datetime.now().year
+                            }
+                        )     
+    else:
+        messages.error(request, 'Not permitted!')
+        return HttpResponseRedirect('/')     
     

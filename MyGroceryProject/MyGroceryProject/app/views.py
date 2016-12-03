@@ -77,7 +77,7 @@ def generalUserReg(request):
                     AuthUser = authenticate(username = userName,password = passWord)
                     login(request,AuthUser) 
                     messages.success(request, 'User successfully created and logged in!')
-                    return HttpResponseRedirect('app/index.html')        
+                    return HttpResponseRedirect('/')        
             else:
                 messages.error(request, 'Confirm password entered does not match with password entered!')
                 return render(

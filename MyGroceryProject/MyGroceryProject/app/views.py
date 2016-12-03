@@ -35,6 +35,7 @@ from datetime import datetime
 from django.core.mail import EmailMessage
 from django.http import BadHeaderError
 
+
 def home(request):
     """Renders the home page."""
     assert isinstance(request, HttpRequest)
@@ -54,11 +55,11 @@ def generalUserReg(request):
         if f.is_valid():
             if (f.cleaned_data.get('General_User_Password') == f.cleaned_data.get('General_User_Password_Confirm')):     
                 userName = f.cleaned_data.get('General_User_Name')
-                password = f.cleaned_data.get('General_User_Password')               
+                passWord = f.cleaned_data.get('General_User_Password')               
                 email = f.cleaned_data.get('Email')             
                 try:
                     genUser = General_User.objects.create(General_User_Name = userName, Email = email)
-                    genAuthUser = User.objects.create_user(userName,email, password)
+                    genAuthUser = User.objects.create_user(userName,email, passWord)
                     group = Group.objects.get(name='generalUser')
                     genAuthUser.groups.add(group)
                     genAuthUser.save()
@@ -72,16 +73,11 @@ def generalUserReg(request):
                                 'year':datetime.now().year,
                             }
                         )
-                if genAuthUser:  
+                if genAuthUser: 
+                    AuthUser = authenticate(username = userName,password = passWord)
+                    login(request,AuthUser) 
                     messages.success(request, 'User successfully created and logged in!')
-                    return render(                    
-                                request,
-                                'app/index.html',
-                                {
-                                    'title':'Home Page',
-                                    'year':datetime.now().year,
-                                }
-                            )         
+                    return HttpResponseRedirect('app/index.html')        
             else:
                 messages.error(request, 'Confirm password entered does not match with password entered!')
                 return render(
@@ -121,7 +117,7 @@ def premiumUserReg(request):
         if f.is_valid():
             if (f.cleaned_data.get('Premium_User_Password') == f.cleaned_data.get('Premium_User_Password_Confirm')):
                 userName = f.cleaned_data.get('Premium_User_Name')
-                password = f.cleaned_data.get('Premium_User_Password')                     
+                passWord = f.cleaned_data.get('Premium_User_Password')                     
                 email = f.cleaned_data.get('Email')
                 StoreName =  f.cleaned_data.get('Store_Name')
                 Address = f.cleaned_data.get('Address')
@@ -130,7 +126,7 @@ def premiumUserReg(request):
                 try:
                     premUser = Premium_User.objects.create(Premium_User_Name = userName,
                                                                 Email = email, Store_Name = StoreName,Store_Address = Address, Store_Zip = Zip, Store_Phone = Phone)
-                    premAuthUser = User.objects.create_user(userName,email, password);
+                    premAuthUser = User.objects.create_user(userName,email, passWord);
                     group = Group.objects.get(name='premiumUser')
                     premAuthUser.groups.add(group)
                     premAuthUser.save()
@@ -144,15 +140,11 @@ def premiumUserReg(request):
                                 'year':datetime.now().year,
                             }
                         )
+
+                AuthUser = authenticate(username = userName,password = passWord)
+                login(request,AuthUser)
                 messages.success(request, 'Premium User successfully created and logged in!')
-                return render(                    
-                            request,
-                            'app/PremiumUserDashboard.html',
-                            {
-                                'title':'Premium User Dashboard',
-                                'year':datetime.now().year,
-                            }
-                        )
+                return HttpResponseRedirect('app/PremiumUserDashboard.html')               
             else:
                 messages.error(request, 'Confirm password entered does not match with password entered!')
                 return render(

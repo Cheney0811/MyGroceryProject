@@ -25,12 +25,17 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li><a href="{% url 'home' %}">Home</a></li>
-                    {% if user.is_authenticated %}
-                    <li>Hello {{ user.username }}!</li>
-                    <li><a href="{% url 'LogOut'  %}">Log out</a></li>
+                    {% if user.is_authenticated %}                        
+                        <li>Hello {{ user.username }}!</li>
+                        <li><a href="{% url 'LogOut'  %}">Log out</a></li>
+                       {% for group in user.groups.all %}
+                           {% if group.name == 'premiumUser' %}
+                             <li><a href="{% url 'PremumUserDashboard' %}">Dash Board</a></li>
+                           {% endif %}
+                       {% endfor %}                           
                     {% else %}
-                    <li>Hello Guest!</li>
-                    <li><a href="{% url 'LogIn' %}">Log in</a></li>
+                        <li>Hello Guest!</li>
+                        <li><a href="{% url 'LogIn' %}">Log in</a></li>
                     {% endif %}
                 </ul>
                 

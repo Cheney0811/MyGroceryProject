@@ -459,7 +459,7 @@ def PremiumUserPublishAD(request):
                     recipient_list.append(receiver.email) 
                                
                 email = EmailMessage(subject,message,from_email,recipient_list)
-                email.attach(File.name,File.read(),File.content_type)
+                email.attach(File.name,bytes,File.content_type)
                 email.send()
                     
                 messages.success(request,  "Advertisement successfully published!")                     

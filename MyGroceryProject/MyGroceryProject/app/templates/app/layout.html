@@ -40,8 +40,10 @@
                 </ul>
                 
                 <ul class="nav navbar-nav navbar-right">
+                    {% if user.is_authenticated %}
                     <li><a href="{% url 'searchStores' %}">Search Stores</a></li>
                     <li><a href="{% url 'searchProduct' %}">Search Product</a></li>
+                    {% endif %}
                 </ul>
 
             </div>

@@ -445,7 +445,7 @@ def PremiumUserPublishAD(request):
 
                     #Send advertisement to general user as email
                     subject = 'MyGrocery Advertisement'
-                    message = 'Special Today'  
+                    message = 'Special Today : ' + Subject 
                     from_email = 'MyGrocery@iastate.com'
                     recipient_list = [] 
 
@@ -453,7 +453,7 @@ def PremiumUserPublishAD(request):
                     for receiver in user_in_GeneralGroup:                               
                         recipient_list.append(receiver.email) 
                                
-                    email = EmailMessage(subject,message,from_email,recipient_list)
+                    email = EmailMessage(subject,message,from_email,bcc = recipient_list)
                     email.attach(File.name,bytes,File.content_type)
                     email.send()
                     

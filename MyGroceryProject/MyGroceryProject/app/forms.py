@@ -19,34 +19,34 @@ class BootstrapAuthenticationForm(AuthenticationForm):
                                    'placeholder':'Password'}))
 
 class generalUserRegForm(forms.Form):
-    General_User_Name = forms.CharField(label = 'User Name', max_length = 10)
-    General_User_Password = forms.CharField(label = 'Password', max_length = 20 , widget=forms.PasswordInput({'placeholder':'Password'}))
-    General_User_Password_Confirm = forms.CharField(label = 'Confirm Password', max_length = 20, widget=forms.PasswordInput({'placeholder':'Password'}))
-    Email = forms.EmailField(label = 'E-Mail')
+    General_User_Name = forms.CharField(label = 'User Name', max_length = 10,widget=forms.TextInput({'class': 'form-control'}))
+    General_User_Password = forms.CharField(label = 'Password', max_length = 20 , widget=forms.PasswordInput({'class': 'form-control','placeholder':'Password'}))
+    General_User_Password_Confirm = forms.CharField(label = 'Confirm Password', max_length = 20, widget=forms.PasswordInput({'class': 'form-control','placeholder':'Password'}))
+    Email = forms.EmailField(label = 'E-Mail',widget=forms.EmailInput({'class': 'form-control'}))
 
 class premiumUserRegForm(forms.Form):
-    Premium_User_Name = forms.CharField(label = 'User Name', max_length = 10)
-    Premium_User_Password = forms.CharField(label = 'Password', max_length = 20, widget=forms.PasswordInput({'placeholder':'Password'}))
-    Premium_User_Password_Confirm = forms.CharField(label = 'Confirm Password', max_length = 20, widget=forms.PasswordInput({'placeholder':'Password'}))
-    Email = forms.EmailField(label = 'E-Mail')
-    Store_Name = forms.CharField(label = 'Store Name', max_length = 10)
-    Address = forms.CharField(label = 'Store Address')
-    Zip = forms.CharField(label = 'Zip', max_length = 11)
-    Phone = forms.CharField(label = 'Phone Num', max_length = 10)
+    Premium_User_Name = forms.CharField(label = 'User Name', max_length = 10,widget=forms.TextInput({'class': 'form-control'}))
+    Premium_User_Password = forms.CharField(label = 'Password', max_length = 20, widget=forms.PasswordInput({'class': 'form-control','placeholder':'Password'}))
+    Premium_User_Password_Confirm = forms.CharField(label = 'Confirm Password', max_length = 20, widget=forms.PasswordInput({'class': 'form-control','placeholder':'Password'}))
+    Email = forms.EmailField(label = 'E-Mail', widget=forms.EmailInput({'class': 'form-control'}))
+    Store_Name = forms.CharField(label = 'Store Name', max_length = 10,widget=forms.TextInput({'class': 'form-control'}))
+    Address = forms.CharField(label = 'Store Address', widget=forms.TextInput({'class': 'form-control'}))
+    Zip = forms.CharField(label = 'Zip', max_length = 11, widget=forms.TextInput({'class': 'form-control'}))
+    Phone = forms.CharField(label = 'Phone Num', max_length = 10, widget=forms.TextInput({'class': 'form-control','placeholder':'555-555-5555'}))
 
 class userLoginForm(forms.Form):
-    User_Name = forms.CharField(label = 'User Name', max_length = 10)
-    User_Password = forms.CharField(label = 'Password', max_length = 20, widget=forms.PasswordInput({'placeholder':'Password'}))
+    User_Name = forms.CharField(label = 'User Name', max_length = 10,widget=forms.TextInput({'class': 'form-control'}))
+    User_Password = forms.CharField(label = 'Password', max_length = 20, widget=forms.PasswordInput({'class': 'form-control','placeholder':'Password'}))
 
 class searchForStoreForm(forms.Form):
-    Search_Zip = forms.CharField(label = 'Zip Code', max_length = 11)
-
+    Search_Zip = forms.CharField(label = 'Zip Code', max_length = 11,widget=forms.TextInput({'class': 'form-control'})
+)
 class searchForProductForm(forms.Form):
-    Product_Name = forms.CharField(label = 'Product Name', max_length = 10)
+    Product_Name = forms.CharField(label = 'Product Name', max_length = 10, widget=forms.TextInput({'class': 'form-control'}))
 
 class publishAdvertisementForm(forms.Form):
-    AD_Subject = forms.CharField(label = 'Product Name', max_length = 10)
-    AD_Content = forms.FileField(label = 'Upload Poster')
+    AD_Subject = forms.CharField(label = 'Product Name', max_length = 10, widget=forms.TextInput({'class': 'form-control'}))
+    AD_Content = forms.FileField(label = 'Upload Poster', widget=forms.FileInput({'class': 'form-control'}))
 
 
 class InventoryForm(forms.Form):

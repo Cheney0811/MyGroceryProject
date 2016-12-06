@@ -286,7 +286,7 @@ def searchProduct(request):
 
             if Product.objects.filter(Product_Name = product_name).exists():
                 product_item = Product.objects.get(Product_Name = product_name)
-                Qurery_Results = Product_List.objects.filter(product = product_item)
+                Qurery_Results = Product_List.objects.filter(product = product_item).order_by('price')
 
                 if Qurery_Results:
                     return render(

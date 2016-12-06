@@ -11,7 +11,7 @@ class Product(models.Model):
     Product_Name = models.CharField(null = False, max_length = 10)
 
 class Premium_User(models.Model):
-    Premium_User_Name = models.CharField(null = False, max_length = 10)
+    Premium_User_Name = models.CharField(null = False, max_length = 10, unique=True)
     Email = models.EmailField(null = False)
     Store_Name = models.CharField(null = False, max_length = 10)
     Store_Address = models.TextField(null = False)
@@ -19,7 +19,7 @@ class Premium_User(models.Model):
     Store_Phone = models.CharField(null = False, max_length = 10)
 
 class General_User(models.Model):
-    General_User_Name = models.CharField(null = False, max_length = 10)
+    General_User_Name = models.CharField(null = False, max_length = 10, unique=True)
     Email = models.EmailField(null = False)
 
 class Product_List(models.Model):
